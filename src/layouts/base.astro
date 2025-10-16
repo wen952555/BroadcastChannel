@@ -68,7 +68,7 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
 ---
 
 <!doctype html>
-<html lang={locale ?? 'en'}>
+<html lang={locale ?? 'zh-cn'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -102,7 +102,7 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
             <div class="nav">
               <div class="nav-item">
                 <a href={SITE_URL} title={channel?.title} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
-                  Home
+                  首页
                 </a>
               </div>
               {
@@ -110,10 +110,10 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
                   <div class="nav-item">
                     <a
                       href={`${SITE_URL}tags`}
-                      title="Tags"
+                      title="标签"
                       class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
                     >
-                      Tags
+                      标签
                     </a>
                   </div>
                 ) : null
@@ -123,10 +123,10 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
                   <div class="nav-item">
                     <a
                       href={`${SITE_URL}links`}
-                      title="Links"
+                      title="链接"
                       class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
                     >
-                      Links
+                      链接
                     </a>
                   </div>
                 ) : null
@@ -141,13 +141,13 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
                 ))
               }
             </div>
-            <input class="search-icon" name="icon" type="checkbox" placeholder="Search" />
+            <input class="search-icon" name="icon" type="checkbox" placeholder="搜索" />
             <form class="search-form" action={searchAction} method="get">
               {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
-              <input type="text" name="q" placeholder="Search" />
+              <input type="text" name="q" placeholder="搜索" />
             </form>
             <div class="copyright-wrap">
-              Powered by
+              由
               <a
                 href="https://github.com/ccbikai/BroadcastChannel"
                 title="BroadcastChannel"
@@ -159,13 +159,14 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
               <a href="https://github.com/Planetable/SiteTemplateSepia" title="Sepia" target="_blank" rel="noopener">
                 Sepia
               </a>
+              驱动
             </div>
           </slot>
         </div>
       </div>
     </div>
-    <a href="#wrapper" id="back-to-top" aria-label="Back to top">
-      <img {...backToTopIcon} alt="Back to Top" />
+    <a href="#wrapper" id="back-to-top" aria-label="返回顶部">
+      <img {...backToTopIcon} alt="返回顶部" />
     </a>
     <Fragment set:html={FOOTER_INJECT} />
   </body>

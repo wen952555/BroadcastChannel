@@ -4,10 +4,9 @@ import 'prismjs/themes/prism.css'
 import dayjs from '../lib/dayjs'
 import { getEnv } from '../lib/env'
 
-const locale = getEnv(import.meta.env, Astro, 'LOCALE')
 const timezone = getEnv(import.meta.env, Astro, 'TIMEZONE')
 
-locale && dayjs.locale(locale)
+dayjs.locale('zh-cn')
 
 const { SITE_URL } = Astro.locals
 const { post, isItem } = Astro.props
@@ -16,7 +15,7 @@ const channel = getEnv(import.meta.env, Astro, 'CHANNEL')
 const COMMENTS = getEnv(import.meta.env, Astro, 'COMMENTS')
 
 const datetime = dayjs(post.datetime).tz(timezone)
-const timeago = datetime.isBefore(dayjs().subtract(1, 'w')) ? datetime.format('HH:mm · ll · ddd') : datetime.fromNow()
+const timeago = datetime.isBefore(dayjs().subtract(1, 'w')) ? datetime.format('HH:mm · YYYY年M月D日 · ddd') : datetime.fromNow()
 ---
 
 <div class="item" style={{ 'view-transition-name': `post-${post.id}` }}>
