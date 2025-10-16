@@ -7,9 +7,9 @@ const { SITE_URL } = Astro.locals
 const { channel, before = true, after = true, isItem = false } = Astro.props
 const posts = channel.posts ?? []
 
-const beforeCursor = posts[posts.length - 1]?.id
-const afterCursor = posts[0]?.id
-// const cursor = +Astro.params.cursor
+const beforeCursor = posts.length > 0 ? posts[posts.length - 1]?.id : null
+const afterCursor = posts.length > 0 ? posts[0]?.id : null
+const nextUrl = before && beforeCursor && beforeCursor > 1 ? `${SITE_URL}before/${beforeCursor}` : null
 ---
 
 <Layout channel={channel} id="main-container">
@@ -20,16 +20,12 @@ const afterCursor = posts[0]?.id
     {posts.map((post) => <Item post={post} isItem={isItem} />)}
   </div>
 
-  <div class="pages-container">
-    {
-      before && beforeCursor > 1 ? (
-        <a href={`${SITE_URL}before/${beforeCursor}`} title="更早" class="page">
-          更早
-        </a>
-      ) : (
-        <span class="page-placeholder">&nbsp;</span>
-      )
-    }
+  <div class="pages-container" id="pagination">
+    {nextUrl ? (
+      <div id="load-more-trigger" data-next-url={nextUrl}>&nbsp;</div>
+    ) : (
+      <span class="page-placeholder">&nbsp;</span>
+    )}
 
     <div class="pages-info"></div>
     {
@@ -43,3 +39,70 @@ const afterCursor = posts[0]?.id
     }
   </div>
 </Layout>
+
+<style>
+  #load-more-trigger.loading {
+    text-align: center;
+    color: #888;
+  }
+</style>
+
+<script>
+  const setupInfiniteScroll = () => {
+    let trigger = document.querySelector('#load-more-trigger');
+    if (!trigger) return;
+
+    const observer = new IntersectionObserver(async (entries) => {
+      const entry = entries[0];
+      if (entry.isIntersecting) {
+        const url = trigger.dataset.nextUrl;
+        if (!url) {
+          observer.unobserve(trigger);
+          return;
+        }
+
+        // Unobserve to prevent multiple triggers
+        observer.unobserve(trigger);
+        trigger.classList.add('loading');
+        trigger.textContent = '加载中...';
+
+        try {
+          const response = await fetch(url);
+          const text = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/html');
+
+          const newItems = doc.querySelector('.items');
+          const newTrigger = doc.querySelector('#load-more-trigger');
+          
+          if (newItems) {
+            document.querySelector('.items').append(...newItems.children);
+          }
+
+          const paginationContainer = document.querySelector('#pagination');
+          // Remove old trigger
+          trigger.remove();
+
+          if (newTrigger && paginationContainer) {
+            // Add the new trigger and start observing it
+            paginationContainer.prepend(newTrigger);
+            trigger = newTrigger; // update reference
+            observer.observe(trigger);
+          }
+
+        } catch (error) {
+          console.error('Infinite scroll failed:', error);
+          if(trigger) {
+            trigger.textContent = '加载失败，请刷新页面重试';
+          }
+        }
+      }
+    }, { rootMargin: '300px' });
+
+    observer.observe(trigger);
+  };
+
+  // Astro view transitions can interfere with simple script execution.
+  // We need to run the setup script after each navigation.
+  document.addEventListener('astro:page-load', setupInfiniteScroll);
+</script>
